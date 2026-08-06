@@ -3,15 +3,15 @@
     <div class="auth-page">
       <div class="auth-card">
         <div class="auth-header">
-          <h2 class="auth-title">Welcome Back</h2>
-          <p class="auth-subtitle">Sign in to your account</p>
+          <h2 class="auth-title">Forgot Password?</h2>
+          <p class="auth-subtitle">No worries, we'll send you reset instructions.</p>
         </div>
 
-        <div v-if="error" class="alert alert-danger">
-          {{ error }}
+        <div v-if="success" class="alert alert-success">
+          <i class="bi bi-check-circle-fill"></i> {{ message }}
         </div>
 
-        <form @submit.prevent="submit">
+        <form v-else @submit.prevent="submit">
           <div class="mb-3">
             <label class="form-label">Email</label>
             <div class="input-group">
@@ -19,7 +19,7 @@
                 <i class="bi bi-envelope"></i>
               </span>
               <input
-                v-model="form.email"
+                v-model="email"
                 type="email"
                 class="form-control"
                 :class="{ 'is-invalid': errors.email }"
@@ -32,52 +32,16 @@
             </div>
           </div>
 
-          <div class="mb-3">
-            <label class="form-label">Password</label>
-            <div class="input-group">
-              <span class="input-group-text">
-                <i class="bi bi-lock"></i>
-              </span>
-              <input
-                v-model="form.password"
-                type="password"
-                class="form-control"
-                :class="{ 'is-invalid': errors.password }"
-                placeholder="Enter your password"
-                required
-              />
-            </div>
-            <div v-if="errors.password" class="invalid-feedback d-block">
-              {{ errors.password[0] }}
-            </div>
-          </div>
-
-          <div class="mb-3 d-flex justify-content-between align-items-center">
-            <div class="form-check">
-              <input
-                v-model="form.remember"
-                type="checkbox"
-                class="form-check-input"
-                id="rememberMe"
-              />
-              <label class="form-check-label" for="rememberMe">
-                Remember Me
-              </label>
-            </div>
-            <router-link to="/forgot-password" class="forgot-link">
-              Forgot Password?
-            </router-link>
-          </div>
-
           <button type="submit" class="btn btn-primary w-100" :disabled="loading">
             <span v-if="loading" class="spinner-border spinner-border-sm me-2"></span>
-            {{ loading ? 'Signing in...' : 'Sign In' }}
+            Send Reset Link
           </button>
         </form>
 
         <div class="auth-footer">
-          <span>Don't have an account? </span>
-          <router-link to="/register">Create Account</router-link>
+          <router-link to="/login">
+            <i class="bi bi-arrow-left"></i> Back to Login
+          </router-link>
         </div>
       </div>
     </div>
@@ -92,42 +56,36 @@ export default {
   data() {
     return {
       path: window.location.pathname,
-      form: { email: '', password: '', remember: false },
+      email: '',
       loading: false,
-      error: '',
+      success: false,
+      message: '',
       errors: {},
     };
   },
   methods: {
     async submit() {
       this.loading = true;
-      this.error = '';
       this.errors = {};
       try {
-        const res = await fetch('/login', {
+        const res = await fetch('/forgot-password', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
             'X-Requested-With': 'XMLHttpRequest',
           },
-          body: JSON.stringify(this.form),
+          body: JSON.stringify({ email: this.email }),
         });
         const data = await res.json();
         if (data.success) {
-          window.authUser = data.user;
-          this.$root.showToast(data.message, 'success');
-          this.$router.push('/dashboard');
+          this.success = true;
+          this.message = data.message;
         } else {
-          if (data.errors) {
-            this.errors = data.errors;
-          } else {
-            this.error = data.message || 'Login failed';
-          }
-          this.$root.showToast(data.message || 'Login failed', 'error');
+          this.errors = data.errors || {};
+          this.$root.showToast(data.message || 'Failed', 'error');
         }
       } catch (e) {
-        this.error = 'Something went wrong';
         this.$root.showToast('Something went wrong', 'error');
       } finally {
         this.loading = false;
@@ -144,7 +102,7 @@ export default {
   align-items: center;
   justify-content: center;
   padding: 2rem 1rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%) !important;
 }
 .auth-card {
   background: #ffffff !important;
@@ -190,28 +148,19 @@ export default {
 .input-group:focus-within .input-group-text {
   border-color: #86b7fe;
 }
-.forgot-link {
-  font-size: 0.875rem;
-  color: #667eea;
-  text-decoration: none;
-}
-.forgot-link:hover {
-  color: #764ba2;
-}
 .auth-footer {
   text-align: center;
   margin-top: 1.5rem;
   padding-top: 1.5rem;
   border-top: 1px solid #e9ecef;
-  color: #6c757d !important;
 }
 .auth-footer a {
-  color: #667eea;
+  color: #f5576c;
   text-decoration: none;
   font-weight: 600;
 }
 .auth-footer a:hover {
-  color: #764ba2;
+  color: #f093fb;
 }
 .alert {
   color: #1a1a2e !important;

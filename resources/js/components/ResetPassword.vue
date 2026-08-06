@@ -3,35 +3,11 @@
     <div class="auth-page">
       <div class="auth-card">
         <div class="auth-header">
-          <h2 class="auth-title">Create Account</h2>
-          <p class="auth-subtitle">Join us today</p>
-        </div>
-
-        <div v-if="error" class="alert alert-danger">
-          {{ error }}
+          <h2 class="auth-title">Reset Password</h2>
+          <p class="auth-subtitle">Create a new password for your account</p>
         </div>
 
         <form @submit.prevent="submit">
-          <div class="mb-3">
-            <label class="form-label">Full Name</label>
-            <div class="input-group">
-              <span class="input-group-text">
-                <i class="bi bi-person"></i>
-              </span>
-              <input
-                v-model="form.name"
-                type="text"
-                class="form-control"
-                :class="{ 'is-invalid': errors.name }"
-                placeholder="John Doe"
-                required
-              />
-            </div>
-            <div v-if="errors.name" class="invalid-feedback d-block">
-              {{ errors.name[0] }}
-            </div>
-          </div>
-
           <div class="mb-3">
             <label class="form-label">Email</label>
             <div class="input-group">
@@ -39,35 +15,27 @@
                 <i class="bi bi-envelope"></i>
               </span>
               <input
-                v-model="form.email"
+                v-model="email"
                 type="email"
                 class="form-control"
-                :class="{ 'is-invalid': errors.email || emailStatus === 'taken' }"
+                :class="{ 'is-invalid': errors.email }"
                 placeholder="you@example.com"
                 required
-                @blur="checkEmail"
-                @input="clearEmailStatus"
               />
             </div>
             <div v-if="errors.email" class="invalid-feedback d-block">
               {{ errors.email[0] }}
             </div>
-            <div v-else-if="emailStatus === 'taken'" class="text-danger small mt-1">
-              <i class="bi bi-exclamation-circle"></i> Email already registered
-            </div>
-            <div v-else-if="emailStatus === 'available'" class="text-success small mt-1">
-              <i class="bi bi-check-circle"></i> Email is available
-            </div>
           </div>
 
           <div class="mb-3">
-            <label class="form-label">Password</label>
+            <label class="form-label">New Password</label>
             <div class="input-group">
               <span class="input-group-text">
                 <i class="bi bi-lock"></i>
               </span>
               <input
-                v-model="form.password"
+                v-model="password"
                 type="password"
                 class="form-control"
                 :class="{ 'is-invalid': errors.password }"
@@ -87,7 +55,7 @@
                 <i class="bi bi-lock-fill"></i>
               </span>
               <input
-                v-model="form.password_confirmation"
+                v-model="password_confirmation"
                 type="password"
                 class="form-control"
                 placeholder="Repeat your password"
@@ -96,15 +64,16 @@
             </div>
           </div>
 
-          <button type="submit" class="btn btn-success w-100" :disabled="loading">
+          <button type="submit" class="btn btn-primary w-100" :disabled="loading">
             <span v-if="loading" class="spinner-border spinner-border-sm me-2"></span>
-            {{ loading ? 'Creating Account...' : 'Sign Up' }}
+            Reset Password
           </button>
         </form>
 
         <div class="auth-footer">
-          <span>Already have an account? </span>
-          <router-link to="/login">Sign In</router-link>
+          <router-link to="/login">
+            <i class="bi bi-arrow-left"></i> Back to Login
+          </router-link>
         </div>
       </div>
     </div>
@@ -119,65 +88,40 @@ export default {
   data() {
     return {
       path: window.location.pathname,
-      form: { name: '', email: '', password: '', password_confirmation: '' },
+      email: '',
+      password: '',
+      password_confirmation: '',
       loading: false,
-      error: '',
       errors: {},
-      emailStatus: '',
     };
   },
   methods: {
-    async checkEmail() {
-      if (!this.form.email) return;
-
-      try {
-        const res = await fetch('/check-email', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-            'X-Requested-With': 'XMLHttpRequest',
-          },
-          body: JSON.stringify({ email: this.form.email }),
-        });
-        const data = await res.json();
-        this.emailStatus = data.available ? 'available' : 'taken';
-      } catch (e) {
-        this.emailStatus = '';
-      }
-    },
-    clearEmailStatus() {
-      this.emailStatus = '';
-    },
     async submit() {
       this.loading = true;
-      this.error = '';
       this.errors = {};
       try {
-        const res = await fetch('/register', {
+        const res = await fetch('/reset-password', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
             'X-Requested-With': 'XMLHttpRequest',
           },
-          body: JSON.stringify(this.form),
+          body: JSON.stringify({
+            email: this.email,
+            password: this.password,
+            password_confirmation: this.password_confirmation,
+          }),
         });
         const data = await res.json();
         if (data.success) {
-          window.authUser = data.user;
-          this.$root.showToast(data.message, 'success');
-          this.$router.push('/dashboard');
+          this.$root.showToast(data.message || 'Password reset successful', 'success');
+          this.$router.push('/login');
         } else {
-          if (data.errors) {
-            this.errors = data.errors;
-          } else {
-            this.error = data.message || 'Registration failed';
-          }
-          this.$root.showToast(data.message || 'Registration failed', 'error');
+          this.errors = data.errors || {};
+          this.$root.showToast(data.message || 'Failed', 'error');
         }
       } catch (e) {
-        this.error = 'Something went wrong';
         this.$root.showToast('Something went wrong', 'error');
       } finally {
         this.loading = false;
@@ -194,7 +138,7 @@ export default {
   align-items: center;
   justify-content: center;
   padding: 2rem 1rem;
-  background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%) !important;
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%) !important;
 }
 .auth-card {
   background: #ffffff !important;
@@ -245,17 +189,13 @@ export default {
   margin-top: 1.5rem;
   padding-top: 1.5rem;
   border-top: 1px solid #e9ecef;
-  color: #6c757d !important;
 }
 .auth-footer a {
-  color: #11998e;
+  color: #4facfe;
   text-decoration: none;
   font-weight: 600;
 }
 .auth-footer a:hover {
-  color: #38ef7d;
-}
-.alert {
-  color: #1a1a2e !important;
+  color: #00f2fe;
 }
 </style>
