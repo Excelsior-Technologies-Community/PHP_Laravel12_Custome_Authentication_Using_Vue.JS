@@ -20,6 +20,7 @@ class Customer extends Authenticatable
         'remember_token',
         'email_verified_at',
         'avatar',
+        'password_changed_at',
     ];
 
     protected $hidden = [
@@ -29,10 +30,16 @@ class Customer extends Authenticatable
 
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'password_changed_at' => 'datetime',
     ];
 
     public function activityLogs(): HasMany
     {
         return $this->hasMany(ActivityLog::class, 'customer_id');
+    }
+
+    public function sessions(): HasMany
+    {
+        return $this->hasMany(CustomerSession::class, 'customer_id');
     }
 }

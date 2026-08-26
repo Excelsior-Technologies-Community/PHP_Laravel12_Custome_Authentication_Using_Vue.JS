@@ -99,40 +99,139 @@ export default {
     };
   },
   methods: {
-    async submit() {
-      this.loading = true;
-      this.error = '';
-      this.errors = {};
-      try {
-        const res = await fetch('/login', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-            'X-Requested-With': 'XMLHttpRequest',
-          },
-          body: JSON.stringify(this.form),
-        });
-        const data = await res.json();
+async submit() {
+
+    this.loading = true;
+
+    this.error = '';
+
+    this.errors = {};
+
+
+    try {
+
+        const res =
+            await this.$root.apiFetch(
+                '/login',
+                {
+                    method: 'POST',
+
+                    headers: {
+                        'Content-Type':
+                            'application/json',
+
+                        'X-CSRF-TOKEN':
+                            this.$root.getCsrfToken(),
+
+                        'X-Requested-With':
+                            'XMLHttpRequest',
+                    },
+
+                    body:
+                        JSON.stringify(
+                            this.form
+                        ),
+                }
+            );
+
+
+        const data =
+            await res.json();
+
+
         if (data.success) {
-          window.authUser = data.user;
-          this.$root.showToast(data.message, 'success');
-          this.$router.push('/dashboard');
+
+            /*
+            |--------------------------------------------------------------------------
+            | Store Authenticated User
+            |--------------------------------------------------------------------------
+            */
+
+            window.authUser =
+                data.user;
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Reset Session Expiration Flag
+            |--------------------------------------------------------------------------
+            */
+
+            this.$root.sessionExpired =
+                false;
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Success Toast
+            |--------------------------------------------------------------------------
+            */
+
+            this.$root.showToast(
+                data.message,
+                'success'
+            );
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Redirect
+            |--------------------------------------------------------------------------
+            */
+
+            await this.$router.push(
+                '/dashboard'
+            );
+
         } else {
-          if (data.errors) {
-            this.errors = data.errors;
-          } else {
-            this.error = data.message || 'Login failed';
-          }
-          this.$root.showToast(data.message || 'Login failed', 'error');
+
+            if (data.errors) {
+
+                this.errors =
+                    data.errors;
+
+            } else {
+
+                this.error =
+                    data.message ||
+                    'Login failed';
+
+            }
+
+
+            this.$root.showToast(
+                data.message ||
+                'Login failed',
+                'error'
+            );
+
         }
-      } catch (e) {
-        this.error = 'Something went wrong';
-        this.$root.showToast('Something went wrong', 'error');
-      } finally {
-        this.loading = false;
-      }
-    },
+
+    } catch (e) {
+
+        console.error(
+            'Login error:',
+            e
+        );
+
+
+        this.error =
+            'Something went wrong';
+
+
+        this.$root.showToast(
+            'Something went wrong',
+            'error'
+        );
+
+    } finally {
+
+        this.loading =
+            false;
+
+    }
+
+},
   },
 };
 </script>
