@@ -4,26 +4,27 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CustomerAuthController;
 use App\Http\Middleware\TrackCustomerSession;
 
+
 /*
 |--------------------------------------------------------------------------
 | Public Pages
 |--------------------------------------------------------------------------
 */
 
-Route::get('/', fn () => view('welcome'));
+Route::get('/', fn() => view('welcome'));
 
-Route::get('/login', fn () => view('layouts.app'));
+Route::get('/login', fn() => view('layouts.app'));
 
-Route::get('/register', fn () => view('layouts.app'));
+Route::get('/register', fn() => view('layouts.app'));
 
-Route::get('/forgot-password', fn () => view('layouts.app'));
+Route::get('/forgot-password', fn() => view('layouts.app'));
 
-Route::get('/reset-password', fn () => view('layouts.app'));
+Route::get('/reset-password', fn() => view('layouts.app'));
 
 
 /*
 |--------------------------------------------------------------------------
-| Authentication Actions
+| Authentication
 |--------------------------------------------------------------------------
 */
 
@@ -41,6 +42,35 @@ Route::post('/logout', [
     CustomerAuthController::class,
     'logout'
 ])->middleware('auth');
+
+
+/*
+|--------------------------------------------------------------------------
+| Email Verification
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/verify-email/{token}', [
+    CustomerAuthController::class,
+    'verifyEmail'
+]);
+
+Route::post('/resend-verification', [
+    CustomerAuthController::class,
+    'resendVerification'
+])->middleware('auth');
+
+
+/*
+|--------------------------------------------------------------------------
+| Two Factor Authentication
+|--------------------------------------------------------------------------
+*/
+
+Route::post('/verify-2fa', [
+    CustomerAuthController::class,
+    'verifyTwoFactor'
+]);
 
 
 /*
@@ -84,91 +114,147 @@ Route::middleware([
     |--------------------------------------------------------------------------
     */
 
-    Route::get('/dashboard', fn () => view('layouts.app'));
-
-    Route::get('/profile', fn () => view('layouts.app'));
-
-    Route::get('/security', fn () => view('layouts.app'));
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | Profile API
-    |--------------------------------------------------------------------------
-    */
+    Route::get(
+        '/dashboard',
+        fn() =>
+        view('layouts.app')
+    );
 
     Route::get(
-        '/api/profile',
-        [CustomerAuthController::class, 'profile']
+        '/profile',
+        fn() =>
+        view('layouts.app')
     );
-
-    Route::post(
-        '/api/profile',
-        [CustomerAuthController::class, 'updateProfile']
-    );
-
-    Route::post(
-        '/api/password/change',
-        [CustomerAuthController::class, 'updatePassword']
-    );
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | Avatar API
-    |--------------------------------------------------------------------------
-    */
-
-    Route::post(
-        '/api/avatar/upload',
-        [CustomerAuthController::class, 'uploadAvatar']
-    );
-
-    Route::delete(
-        '/api/avatar',
-        [CustomerAuthController::class, 'deleteAvatar']
-    );
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | Activity Logs API
-    |--------------------------------------------------------------------------
-    */
 
     Route::get(
-        '/api/activity-logs',
-        [CustomerAuthController::class, 'activityLogs']
+        '/security',
+        fn() =>
+        view('layouts.app')
     );
 
 
     /*
     |--------------------------------------------------------------------------
-    | Security Dashboard API
+    | Profile
     |--------------------------------------------------------------------------
     */
 
-    Route::get(
-        '/api/security',
-        [CustomerAuthController::class, 'securityDashboard']
-    );
+    Route::get('/api/profile', [
+        CustomerAuthController::class,
+        'profile'
+    ]);
+
+    Route::post('/api/profile', [
+        CustomerAuthController::class,
+        'updateProfile'
+    ]);
 
 
     /*
     |--------------------------------------------------------------------------
-    | Session Management
+    | Password
     |--------------------------------------------------------------------------
     */
 
-    // Logout one specific device
+    Route::post('/api/password/change', [
+        CustomerAuthController::class,
+        'updatePassword'
+    ]);
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Two Factor
+    |--------------------------------------------------------------------------
+    */
+
+    Route::post('/api/2fa/toggle', [
+        CustomerAuthController::class,
+        'toggleTwoFactor'
+    ]);
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Avatar
+    |--------------------------------------------------------------------------
+    */
+
+    Route::post('/api/avatar/upload', [
+        CustomerAuthController::class,
+        'uploadAvatar'
+    ]);
+
+    Route::delete('/api/avatar', [
+        CustomerAuthController::class,
+        'deleteAvatar'
+    ]);
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Activity Logs
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get('/api/activity-logs', [
+        CustomerAuthController::class,
+        'activityLogs'
+    ]);
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Security
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get('/api/security', [
+        CustomerAuthController::class,
+        'securityDashboard'
+    ]);
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Sessions
+    |--------------------------------------------------------------------------
+    */
+
     Route::delete(
         '/api/security/sessions/{session}',
-        [CustomerAuthController::class, 'revokeSession']
+        [
+            CustomerAuthController::class,
+            'revokeSession'
+        ]
     );
 
-    // Logout all other devices
     Route::delete(
         '/api/security/sessions',
-        [CustomerAuthController::class, 'revokeOtherSessions']
+        [
+            CustomerAuthController::class,
+            'revokeOtherSessions'
+        ]
     );
+
+    Route::get('/two-factor', fn () =>
+    view('layouts.app')
+);
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Account
+    |--------------------------------------------------------------------------
+    */
+
+    Route::post('/api/account/deactivate', [
+        CustomerAuthController::class,
+        'deactivateAccount'
+    ]);
+
+    Route::delete('/api/account', [
+        CustomerAuthController::class,
+        'deleteAccount'
+    ]);
 });

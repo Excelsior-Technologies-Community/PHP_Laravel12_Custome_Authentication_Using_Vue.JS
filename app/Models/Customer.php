@@ -5,11 +5,10 @@ namespace App\Models;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Customer extends Authenticatable
 {
-    use Notifiable, SoftDeletes;
+    use Notifiable;
 
     protected $table = 'customers';
 
@@ -17,8 +16,13 @@ class Customer extends Authenticatable
         'name',
         'email',
         'password',
-        'remember_token',
         'email_verified_at',
+        'email_verification_token',
+        'two_factor_enabled',
+        'two_factor_otp',
+        'two_factor_otp_expires_at',
+        'is_active',
+        'deactivated_at',
         'avatar',
         'password_changed_at',
     ];
@@ -26,20 +30,31 @@ class Customer extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+        'email_verification_token',
+        'two_factor_otp',
     ];
 
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'two_factor_enabled' => 'boolean',
+        'two_factor_otp_expires_at' => 'datetime',
+        'is_active' => 'boolean',
+        'deactivated_at' => 'datetime',
         'password_changed_at' => 'datetime',
     ];
 
-    public function activityLogs(): HasMany
+    public function passwordHistories(): HasMany
     {
-        return $this->hasMany(ActivityLog::class, 'customer_id');
+        return $this->hasMany(PasswordHistory::class);
     }
 
     public function sessions(): HasMany
     {
-        return $this->hasMany(CustomerSession::class, 'customer_id');
+        return $this->hasMany(CustomerSession::class);
+    }
+
+    public function activityLogs(): HasMany
+    {
+        return $this->hasMany(ActivityLog::class);
     }
 }

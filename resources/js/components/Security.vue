@@ -1,586 +1,123 @@
 <template>
 
-    <div class="security-page">
+    <div class="container mt-4">
 
-        <div class="container py-5">
+        <h2 class="mb-4">
+            Security
+        </h2>
 
 
-            <!-- ========================================================= -->
-            <!-- HEADER -->
-            <!-- ========================================================= -->
+        <!-- Loading -->
+        <div
+            v-if="loading"
+            class="text-center"
+        >
+            Loading security information...
+        </div>
 
-            <div
-                class="d-flex justify-content-between align-items-center mb-4"
-            >
 
-                <div>
+        <template v-else>
 
-                    <h2 class="fw-bold mb-1">
-                        Account Security
-                    </h2>
+            <!-- Security Status -->
+            <div class="card shadow-sm mb-4">
 
-                    <p class="text-muted mb-0">
-                        Monitor your account security and manage active devices.
-                    </p>
-
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        Security Status
+                    </h5>
                 </div>
 
+                <div class="card-body">
 
-                <router-link
-                    to="/dashboard"
-                    class="btn btn-outline-primary"
-                >
-                    ← Dashboard
-                </router-link>
+                    <div class="row">
 
-            </div>
+                        <!-- Email -->
+                        <div class="col-md-4 mb-3">
 
+                            <strong>
+                                Email Verification
+                            </strong>
 
-            <!-- ========================================================= -->
-            <!-- LOADING -->
-            <!-- ========================================================= -->
-
-            <div
-                v-if="loading"
-                class="text-center py-5"
-            >
-
-                <div
-                    class="spinner-border text-primary"
-                    role="status"
-                ></div>
-
-                <p class="text-muted mt-3">
-                    Loading security information...
-                </p>
-
-            </div>
-
-
-            <!-- ========================================================= -->
-            <!-- ERROR -->
-            <!-- ========================================================= -->
-
-            <div
-                v-else-if="error"
-                class="alert alert-danger"
-            >
-
-                <strong>Error:</strong>
-
-                {{ error }}
-
-
-                <button
-                    @click="loadSecurityData"
-                    class="btn btn-sm btn-danger ms-3"
-                >
-                    Retry
-                </button>
-
-            </div>
-
-
-            <!-- ========================================================= -->
-            <!-- SECURITY CONTENT -->
-            <!-- ========================================================= -->
-
-            <template v-else>
-
-
-                <!-- ===================================================== -->
-                <!-- SECURITY STATISTICS -->
-                <!-- ===================================================== -->
-
-                <div class="row g-4 mb-4">
-
-
-                    <!-- Account Created -->
-
-                    <div class="col-md-3">
-
-                        <div class="card security-card h-100">
-
-                            <div class="card-body">
-
-                                <div class="security-icon">
-                                    👤
-                                </div>
-
-                                <p class="text-muted mb-1">
-                                    Account Created
-                                </p>
-
-                                <h5 class="fw-bold">
-                                    {{ formatDate(
-                                        security.account_created_at
-                                    ) }}
-                                </h5>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-
-                    <!-- Last Login -->
-
-                    <div class="col-md-3">
-
-                        <div class="card security-card h-100">
-
-                            <div class="card-body">
-
-                                <div class="security-icon">
-                                    🔐
-                                </div>
-
-                                <p class="text-muted mb-1">
-                                    Last Successful Login
-                                </p>
-
-                                <h5 class="fw-bold">
-                                    {{ formatDate(
-                                        security.last_login_at
-                                    ) }}
-                                </h5>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-
-                    <!-- Password -->
-
-                    <div class="col-md-3">
-
-                        <div class="card security-card h-100">
-
-                            <div class="card-body">
-
-                                <div class="security-icon">
-                                    🔑
-                                </div>
-
-                                <p class="text-muted mb-1">
-                                    Password Last Changed
-                                </p>
-
-                                <h5 class="fw-bold">
-                                    {{ formatDate(
-                                        security.password_changed_at
-                                    ) }}
-                                </h5>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-
-                    <!-- Active Sessions -->
-
-                    <div class="col-md-3">
-
-                        <div class="card security-card h-100">
-
-                            <div class="card-body">
-
-                                <div class="security-icon">
-                                    💻
-                                </div>
-
-                                <p class="text-muted mb-1">
-                                    Active Sessions
-                                </p>
-
-                                <h5 class="fw-bold">
-                                    {{ security.active_sessions_count }}
-                                </h5>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-
-                <!-- ===================================================== -->
-                <!-- LAST LOGIN INFORMATION -->
-                <!-- ===================================================== -->
-
-                <div class="card security-card mb-4">
-
-                    <div class="card-body">
-
-                        <div class="row">
-
-                            <div class="col-md-6">
-
-                                <strong>
-                                    Last Login IP
-                                </strong>
-
-                                <div class="text-muted mt-1">
-
-                                    {{
-                                        security.last_login_ip ||
-                                        'Unknown'
-                                    }}
-
-                                </div>
-
-                            </div>
-
-
-                            <div class="col-md-6">
-
-                                <strong>
-                                    Failed Login Attempts
-                                </strong>
-
-                                <div class="mt-1">
-
-                                    <span class="badge bg-danger fs-6">
-
-                                        {{
-                                            security.failed_login_attempts
-                                        }}
-
-                                    </span>
-
-                                    <small class="text-muted ms-2">
-
-                                        {{
-                                            security.failed_login_attempts_30_days
-                                        }}
-                                        in the last 30 days
-
-                                    </small>
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-
-                <!-- ===================================================== -->
-                <!-- ACTIVE SESSIONS -->
-                <!-- ===================================================== -->
-
-                <div class="card security-card mb-4">
-
-
-                    <div class="card-header bg-transparent py-3">
-
-                        <div
-                            class="d-flex justify-content-between align-items-center"
-                        >
-
-                            <div>
-
-                                <h5 class="fw-bold mb-1">
-                                    Active Devices / Sessions
-                                </h5>
-
-                                <small class="text-muted">
-                                    Devices currently logged into your account.
-                                </small>
-
-                            </div>
-
-
-                            <button
-                                v-if="sessions.length > 1"
-                                @click="logoutOtherSessions"
-                                class="btn btn-danger"
-                                :disabled="processing"
-                            >
-
-                                <span
-                                    v-if="processing"
-                                    class="spinner-border spinner-border-sm me-1"
-                                ></span>
-
-                                Logout All Other Devices
-
-                            </button>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="card-body p-0">
-
-
-                        <!-- No sessions -->
-
-                        <div
-                            v-if="sessions.length === 0"
-                            class="text-center py-5 text-muted"
-                        >
-
-                            <div class="fs-1 mb-2">
-                                💻
-                            </div>
-
-                            <p class="mb-0">
-                                No active sessions found.
-                            </p>
-
-                        </div>
-
-
-                        <!-- Sessions -->
-
-                        <div
-                            v-for="session in sessions"
-                            :key="session.id"
-                            class="session-item"
-                        >
-
-
-                            <div class="session-info">
-
-
-                                <div class="device-icon">
-
-                                    {{
-                                        getDeviceIcon(
-                                            session.device_name
-                                        )
-                                    }}
-
-                                </div>
-
-
-                                <div>
-
-
-                                    <div
-                                        class="d-flex align-items-center gap-2 mb-1"
-                                    >
-
-                                        <h6 class="fw-bold mb-0">
-
-                                            {{
-                                                session.browser ||
-                                                'Unknown Browser'
-                                            }}
-
-                                        </h6>
-
-
-                                        <span
-                                            v-if="session.is_current"
-                                            class="badge bg-success"
-                                        >
-                                            Current Device
-                                        </span>
-
-
-                                        <span
-                                            v-else-if="session.is_active"
-                                            class="badge bg-primary"
-                                        >
-                                            Active
-                                        </span>
-
-                                    </div>
-
-
-                                    <div class="session-details">
-
-
-                                        <div>
-
-                                            💻
-
-                                            {{
-                                                session.device_name ||
-                                                'Unknown Device'
-                                            }}
-
-                                        </div>
-
-
-                                        <div>
-
-                                            🖥️
-
-                                            {{
-                                                session.platform ||
-                                                'Unknown Platform'
-                                            }}
-
-                                        </div>
-
-
-                                        <div>
-
-                                            🌐 IP:
-
-                                            {{
-                                                session.ip_address ||
-                                                'Unknown'
-                                            }}
-
-                                        </div>
-
-
-                                        <div>
-
-                                            🕐 Login:
-
-                                            {{
-                                                formatDate(
-                                                    session.login_at
-                                                )
-                                            }}
-
-                                        </div>
-
-
-                                        <div>
-
-                                            🔄 Last Activity:
-
-                                            {{
-                                                formatDate(
-                                                    session.last_activity_at
-                                                )
-                                            }}
-
-                                        </div>
-
-                                    </div>
-
-                                </div>
-
-                            </div>
-
-
-                            <!-- Logout device -->
-
-                            <div v-if="!session.is_current">
-
-                                <button
-                                    @click="logoutSession(session.id)"
-                                    class="btn btn-outline-danger btn-sm"
-                                    :disabled="processing"
-                                >
-                                    Logout
-                                </button>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-
-                <!-- ===================================================== -->
-                <!-- RECENT SECURITY ACTIVITY -->
-                <!-- ===================================================== -->
-
-                <div class="card security-card">
-
-
-                    <div class="card-header bg-transparent py-3">
-
-                        <h5 class="fw-bold mb-1">
-                            Recent Security Activity
-                        </h5>
-
-                        <small class="text-muted">
-                            Recent login and security events.
-                        </small>
-
-                    </div>
-
-
-                    <div class="card-body p-0">
-
-
-                        <!-- No activities -->
-
-                        <div
-                            v-if="activities.length === 0"
-                            class="text-center py-5 text-muted"
-                        >
-                            No recent security activity.
-                        </div>
-
-
-                        <!-- Activities -->
-
-                        <div
-                            v-for="activity in activities"
-                            :key="activity.id"
-                            class="activity-item"
-                        >
-
-
-                            <div>
+                            <div class="mt-2">
 
                                 <span
                                     class="badge"
                                     :class="
-                                        getActivityBadge(
-                                            activity.action
-                                        )
+                                        security.email_verified
+                                            ? 'bg-success'
+                                            : 'bg-warning text-dark'
                                     "
                                 >
 
                                     {{
-                                        activity.action
+                                        security.email_verified
+                                            ? 'Verified'
+                                            : 'Not Verified'
                                     }}
 
                                 </span>
 
                             </div>
 
+                        </div>
 
-                            <div class="activity-description">
 
-                                {{
-                                    activity.description
-                                }}
+                        <!-- 2FA -->
+                        <div class="col-md-4 mb-3">
+
+                            <strong>
+                                Two-Factor Authentication
+                            </strong>
+
+                            <div class="mt-2">
+
+                                <span
+                                    class="badge"
+                                    :class="
+                                        security.two_factor_enabled
+                                            ? 'bg-success'
+                                            : 'bg-secondary'
+                                    "
+                                >
+
+                                    {{
+                                        security.two_factor_enabled
+                                            ? 'Enabled'
+                                            : 'Disabled'
+                                    }}
+
+                                </span>
 
                             </div>
 
-
-                            <div class="activity-ip">
-
-                                {{
-                                    activity.ip_address ||
-                                    'Unknown IP'
-                                }}
-
-                            </div>
+                        </div>
 
 
-                            <div class="activity-date">
+                        <!-- Account -->
+                        <div class="col-md-4 mb-3">
 
-                                {{
-                                    formatDate(
-                                        activity.created_at
-                                    )
-                                }}
+                            <strong>
+                                Account Status
+                            </strong>
+
+                            <div class="mt-2">
+
+                                <span
+                                    class="badge"
+                                    :class="
+                                        security.account_active
+                                            ? 'bg-success'
+                                            : 'bg-danger'
+                                    "
+                                >
+
+                                    {{
+                                        security.account_active
+                                            ? 'Active'
+                                            : 'Inactive'
+                                    }}
+
+                                </span>
 
                             </div>
 
@@ -590,804 +127,602 @@
 
                 </div>
 
+            </div>
 
-            </template>
 
-        </div>
+            <!-- Two Factor -->
+            <div class="card shadow-sm mb-4">
+
+                <div class="card-header">
+
+                    <h5 class="mb-0">
+                        Two-Factor Authentication
+                    </h5>
+
+                </div>
+
+                <div class="card-body">
+
+                    <p class="text-muted">
+
+                        Add an extra layer of security.
+                        When enabled, you will receive
+                        an OTP by email during login.
+
+                    </p>
+
+
+                    <div class="mb-3">
+
+                        <span
+                            class="badge me-2"
+                            :class="
+                                security.two_factor_enabled
+                                    ? 'bg-success'
+                                    : 'bg-secondary'
+                            "
+                        >
+
+                            {{
+                                security.two_factor_enabled
+                                    ? '2FA Enabled'
+                                    : '2FA Disabled'
+                            }}
+
+                        </span>
+
+                    </div>
+
+
+                    <button
+                        type="button"
+                        class="btn"
+                        :class="
+                            security.two_factor_enabled
+                                ? 'btn-danger'
+                                : 'btn-success'
+                        "
+                        @click="toggleTwoFactor"
+                        :disabled="twoFactorLoading"
+                    >
+
+                        {{
+                            twoFactorLoading
+                                ? 'Processing...'
+                                : security.two_factor_enabled
+                                    ? 'Disable 2FA'
+                                    : 'Enable 2FA'
+                        }}
+
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- Password -->
+            <div class="card shadow-sm mb-4">
+
+                <div class="card-header">
+
+                    <h5 class="mb-0">
+                        Password Security
+                    </h5>
+
+                </div>
+
+                <div class="card-body">
+
+                    <p>
+                        Last changed:
+                        <strong>
+                            {{
+                                formatDate(
+                                    security.password_changed_at
+                                )
+                            }}
+                        </strong>
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- Login Information -->
+            <div class="card shadow-sm mb-4">
+
+                <div class="card-header">
+
+                    <h5 class="mb-0">
+                        Login Information
+                    </h5>
+
+                </div>
+
+                <div class="card-body">
+
+                    <p>
+                        Last Login:
+                        <strong>
+                            {{
+                                formatDate(
+                                    security.last_login_at
+                                )
+                            }}
+                        </strong>
+                    </p>
+
+                    <p>
+                        Last Login IP:
+                        <strong>
+                            {{
+                                security.last_login_ip ||
+                                'N/A'
+                            }}
+                        </strong>
+                    </p>
+
+                    <p>
+                        Failed Login Attempts:
+                        <strong>
+                            {{
+                                security.failed_login_attempts
+                            }}
+                        </strong>
+                    </p>
+
+                    <p>
+                        Failed Login Attempts
+                        Last 30 Days:
+                        <strong>
+                            {{
+                                security.failed_login_attempts_30_days
+                            }}
+                        </strong>
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- Active Sessions -->
+            <div class="card shadow-sm mb-4">
+
+                <div class="card-header">
+
+                    <h5 class="mb-0">
+                        Active Sessions
+                    </h5>
+
+                </div>
+
+                <div class="card-body">
+
+                    <p>
+
+                        Active Sessions:
+
+                        <strong>
+                            {{
+                                security.active_sessions_count
+                            }}
+                        </strong>
+
+                    </p>
+
+                    <p>
+
+                        Total Sessions:
+
+                        <strong>
+                            {{
+                                security.total_sessions_count
+                            }}
+                        </strong>
+
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- Deactivate -->
+            <div class="card border-warning shadow-sm mb-4">
+
+                <div class="card-header bg-warning">
+
+                    <h5 class="mb-0">
+                        Deactivate Account
+                    </h5>
+
+                </div>
+
+                <div class="card-body">
+
+                    <p class="text-muted">
+
+                        Deactivating your account will
+                        prevent you from logging in.
+
+                    </p>
+
+                    <button
+                        type="button"
+                        class="btn btn-warning"
+                        @click="deactivateAccount"
+                        :disabled="accountLoading"
+                    >
+
+                        {{
+                            accountLoading
+                                ? 'Processing...'
+                                : 'Deactivate Account'
+                        }}
+
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- Delete -->
+            <div class="card border-danger shadow-sm mb-4">
+
+                <div class="card-header bg-danger text-white">
+
+                    <h5 class="mb-0">
+                        Delete Account
+                    </h5>
+
+                </div>
+
+                <div class="card-body">
+
+                    <p class="text-danger">
+
+                        <strong>
+                            Warning:
+                        </strong>
+
+                        This action permanently deletes
+                        your account and cannot be undone.
+
+                    </p>
+
+                    <button
+                        type="button"
+                        class="btn btn-danger"
+                        @click="deleteAccount"
+                        :disabled="deleteLoading"
+                    >
+
+                        {{
+                            deleteLoading
+                                ? 'Deleting...'
+                                : 'Permanently Delete Account'
+                        }}
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </template>
 
     </div>
 
 </template>
 
 
-<script>
+<script setup>
 
-export default {
+import {
+    ref,
+    onMounted
+} from 'vue';
 
-    data() {
+import axios from 'axios';
 
-        return {
 
-            loading: true,
+/*
+|--------------------------------------------------------------------------
+| State
+|--------------------------------------------------------------------------
+*/
 
-            processing: false,
+const loading = ref(true);
 
-            error: null,
+const twoFactorLoading =
+    ref(false);
 
+const accountLoading =
+    ref(false);
 
-            security: {
+const deleteLoading =
+    ref(false);
 
-                account_created_at: null,
+const error = ref('');
 
-                last_login_at: null,
 
-                last_login_ip: null,
+/*
+|--------------------------------------------------------------------------
+| Security
+|--------------------------------------------------------------------------
+*/
 
-                password_changed_at: null,
+const security = ref({
 
-                active_sessions_count: 0,
+    email_verified: false,
 
-                total_sessions_count: 0,
+    two_factor_enabled: false,
 
-                failed_login_attempts: 0,
+    account_active: true,
 
-                failed_login_attempts_30_days: 0,
+    password_changed_at: null,
 
-            },
+    last_login_at: null,
 
+    last_login_ip: null,
 
-            sessions: [],
+    failed_login_attempts: 0,
 
-            activities: [],
+    failed_login_attempts_30_days: 0,
 
-        };
+    active_sessions_count: 0,
 
-    },
+    total_sessions_count: 0,
+});
 
 
-    mounted() {
+/*
+|--------------------------------------------------------------------------
+| Load Security
+|--------------------------------------------------------------------------
+*/
 
-        this.loadSecurityData();
+const loadSecurity = async () => {
 
-    },
+    loading.value = true;
 
+    try {
 
-    methods: {
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | LOAD SECURITY DATA
-        |--------------------------------------------------------------------------
-        */
-
-        async loadSecurityData() {
-
-            this.loading = true;
-
-            this.error = null;
-
-
-            try {
-
-                const response = await fetch(
-                    '/api/security',
-                    {
-                        method: 'GET',
-
-                        credentials: 'same-origin',
-
-                        headers: {
-
-                            'Accept':
-                                'application/json',
-
-                            'X-Requested-With':
-                                'XMLHttpRequest',
-
-                        },
-
-                    }
-                );
-
-
-                if (!response.ok) {
-
-                    if (response.status === 401) {
-
-                        window.authUser = null;
-
-                        this.$router.push('/login');
-
-                        return;
-
-                    }
-
-
-                    throw new Error(
-                        `Unable to load security information. HTTP ${response.status}`
-                    );
-
-                }
-
-
-                const data =
-                    await response.json();
-
-
-                if (!data.success) {
-
-                    throw new Error(
-                        data.message ||
-                        'Unable to load security information.'
-                    );
-
-                }
-
-
-                this.security = {
-
-                    ...this.security,
-
-                    ...(data.security || {}),
-
-                };
-
-
-                this.sessions =
-                    data.sessions || [];
-
-
-                this.activities =
-                    data.recent_activities || [];
-
-
-            } catch (error) {
-
-                console.error(
-                    'Security dashboard error:',
-                    error
-                );
-
-
-                this.error =
-                    error.message ||
-                    'Unable to load security information.';
-
-
-            } finally {
-
-                this.loading = false;
-
-            }
-
-        },
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | LOGOUT ONE SESSION
-        |--------------------------------------------------------------------------
-        */
-
-        async logoutSession(sessionId) {
-
-            if (
-                !confirm(
-                    'Are you sure you want to logout this device?'
-                )
-            ) {
-
-                return;
-
-            }
-
-
-            this.processing = true;
-
-
-            try {
-
-                const response = await fetch(
-
-                    `/api/security/sessions/${sessionId}`,
-
-                    {
-
-                        method: 'DELETE',
-
-                        credentials: 'same-origin',
-
-                        headers: {
-
-                            'Accept':
-                                'application/json',
-
-                            'X-Requested-With':
-                                'XMLHttpRequest',
-
-                            'X-CSRF-TOKEN':
-                                this.getCsrfToken(),
-
-                        },
-
-                    }
-
-                );
-
-
-                const data =
-                    await this.getJsonResponse(
-                        response
-                    );
-
-
-                if (
-                    !response.ok ||
-                    !data.success
-                ) {
-
-                    throw new Error(
-
-                        data.message ||
-                        'Unable to logout this session.'
-
-                    );
-
-                }
-
-
-                this.showToast(
-
-                    data.message ||
-                    'Device logged out successfully.',
-
-                    'success'
-
-                );
-
-
-                await this.loadSecurityData();
-
-
-            } catch (error) {
-
-                console.error(error);
-
-
-                this.showToast(
-
-                    error.message ||
-                    'Unable to logout device.',
-
-                    'error'
-
-                );
-
-
-            } finally {
-
-                this.processing = false;
-
-            }
-
-        },
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | LOGOUT OTHER SESSIONS
-        |--------------------------------------------------------------------------
-        */
-
-        async logoutOtherSessions() {
-
-            if (
-                !confirm(
-                    'Are you sure you want to logout all other devices?'
-                )
-            ) {
-
-                return;
-
-            }
-
-
-            this.processing = true;
-
-
-            try {
-
-                const response = await fetch(
-
-                    '/api/security/sessions',
-
-                    {
-
-                        method: 'DELETE',
-
-                        credentials: 'same-origin',
-
-                        headers: {
-
-                            'Accept':
-                                'application/json',
-
-                            'X-Requested-With':
-                                'XMLHttpRequest',
-
-                            'X-CSRF-TOKEN':
-                                this.getCsrfToken(),
-
-                        },
-
-                    }
-
-                );
-
-
-                const data =
-                    await this.getJsonResponse(
-                        response
-                    );
-
-
-                if (
-                    !response.ok ||
-                    !data.success
-                ) {
-
-                    throw new Error(
-
-                        data.message ||
-                        'Unable to logout other devices.'
-
-                    );
-
-                }
-
-
-                this.showToast(
-
-                    data.message ||
-                    'All other devices have been logged out.',
-
-                    'success'
-
-                );
-
-
-                await this.loadSecurityData();
-
-
-            } catch (error) {
-
-                console.error(error);
-
-
-                this.showToast(
-
-                    error.message ||
-                    'Unable to logout other devices.',
-
-                    'error'
-
-                );
-
-
-            } finally {
-
-                this.processing = false;
-
-            }
-
-        },
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | JSON RESPONSE HELPER
-        |--------------------------------------------------------------------------
-        */
-
-        async getJsonResponse(response) {
-
-            const text =
-                await response.text();
-
-
-            try {
-
-                return text
-                    ? JSON.parse(text)
-                    : {};
-
-            } catch (error) {
-
-                return {
-
-                    success: false,
-
-                    message:
-                        `Server returned HTTP ${response.status}`,
-
-                };
-
-            }
-
-        },
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | CSRF TOKEN
-        |--------------------------------------------------------------------------
-        */
-
-        getCsrfToken() {
-
-            const element =
-                document.querySelector(
-                    'meta[name="csrf-token"]'
-                );
-
-
-            if (!element) {
-
-                console.error(
-                    'CSRF meta tag not found.'
-                );
-
-                return '';
-
-            }
-
-
-            return element.getAttribute(
-                'content'
+        const response =
+            await axios.get(
+                '/api/security'
             );
 
-        },
+        if (response.data.success) {
 
+            security.value =
+                response.data.security;
+        }
 
-        /*
-        |--------------------------------------------------------------------------
-        | DATE FORMAT
-        |--------------------------------------------------------------------------
-        */
+    } catch (err) {
 
-        formatDate(date) {
+        error.value =
+            err.response?.data?.message ||
+            'Unable to load security information.';
 
-            if (!date) {
+        alert(error.value);
 
-                return 'Never';
+    } finally {
 
-            }
-
-
-            const parsedDate =
-                new Date(date);
-
-
-            if (
-                isNaN(
-                    parsedDate.getTime()
-                )
-            ) {
-
-                return date;
-
-            }
-
-
-            return parsedDate.toLocaleString();
-
-        },
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | DEVICE ICON
-        |--------------------------------------------------------------------------
-        */
-
-        getDeviceIcon(device) {
-
-            if (!device) {
-
-                return '💻';
-
-            }
-
-
-            const value =
-                device.toLowerCase();
-
-
-            if (
-
-                value.includes('mobile') ||
-                value.includes('android') ||
-                value.includes('iphone') ||
-                value.includes('ios')
-
-            ) {
-
-                return '📱';
-
-            }
-
-
-            if (
-
-                value.includes('tablet') ||
-                value.includes('ipad')
-
-            ) {
-
-                return '📲';
-
-            }
-
-
-            return '💻';
-
-        },
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | ACTIVITY BADGE
-        |--------------------------------------------------------------------------
-        */
-
-        getActivityBadge(action) {
-
-            switch (
-                (action || '').toLowerCase()
-            ) {
-
-                case 'login':
-                    return 'bg-success';
-
-                case 'logout':
-                    return 'bg-secondary';
-
-                case 'register':
-                    return 'bg-primary';
-
-                case 'password_change':
-                case 'password_changed':
-                    return 'bg-warning text-dark';
-
-                case 'failed_login':
-                    return 'bg-danger';
-
-                case 'session_revoked':
-                case 'sessions_revoked':
-                    return 'bg-danger';
-
-                case 'profile_update':
-                    return 'bg-info';
-
-                case 'avatar_upload':
-                    return 'bg-info';
-
-                case 'avatar_delete':
-                    return 'bg-secondary';
-
-                case 'forgot_password':
-                    return 'bg-warning text-dark';
-
-                default:
-                    return 'bg-info';
-
-            }
-
-        },
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | TOAST
-        |--------------------------------------------------------------------------
-        */
-
-        showToast(
-            message,
-            type = 'success'
-        ) {
-
-            if (
-
-                this.$root &&
-                typeof this.$root.showToast ===
-                    'function'
-
-            ) {
-
-                this.$root.showToast(
-                    message,
-                    type
-                );
-
-            } else {
-
-                alert(message);
-
-            }
-
-        },
-
-    },
-
+        loading.value = false;
+    }
 };
 
+
+/*
+|--------------------------------------------------------------------------
+| Toggle 2FA
+|--------------------------------------------------------------------------
+*/
+
+const toggleTwoFactor = async () => {
+
+    const action =
+        security.value.two_factor_enabled
+            ? 'disable'
+            : 'enable';
+
+    if (
+        !confirm(
+            `Are you sure you want to ${action} two-factor authentication?`
+        )
+    ) {
+
+        return;
+    }
+
+    twoFactorLoading.value = true;
+
+    try {
+
+        const response =
+            await axios.post(
+                '/api/2fa/toggle'
+            );
+
+        if (response.data.success) {
+
+            security.value.two_factor_enabled =
+                response.data.two_factor_enabled;
+
+            alert(
+                response.data.message
+            );
+        }
+
+    } catch (err) {
+
+        alert(
+            err.response?.data?.message ||
+            'Unable to update 2FA.'
+        );
+
+    } finally {
+
+        twoFactorLoading.value = false;
+    }
+};
+
+
+/*
+|--------------------------------------------------------------------------
+| Deactivate Account
+|--------------------------------------------------------------------------
+*/
+
+const deactivateAccount = async () => {
+
+    const confirmed =
+        confirm(
+            'Are you sure you want to deactivate your account?'
+        );
+
+    if (!confirmed) {
+
+        return;
+    }
+
+    const secondConfirm =
+        confirm(
+            'You will be logged out and will not be able to login until the account is activated again. Continue?'
+        );
+
+    if (!secondConfirm) {
+
+        return;
+    }
+
+    accountLoading.value = true;
+
+    try {
+
+        const response =
+            await axios.post(
+                '/api/account/deactivate'
+            );
+
+        if (response.data.success) {
+
+            alert(
+                response.data.message
+            );
+
+            window.location.href =
+                '/login';
+        }
+
+    } catch (err) {
+
+        alert(
+            err.response?.data?.message ||
+            'Unable to deactivate account.'
+        );
+
+    } finally {
+
+        accountLoading.value = false;
+    }
+};
+
+
+/*
+|--------------------------------------------------------------------------
+| Delete Account
+|--------------------------------------------------------------------------
+*/
+
+const deleteAccount = async () => {
+
+    const confirmed =
+        confirm(
+            'WARNING: This will permanently delete your account. Are you sure?'
+        );
+
+    if (!confirmed) {
+
+        return;
+    }
+
+    const secondConfirm =
+        confirm(
+            'This action cannot be undone. Delete your account permanently?'
+        );
+
+    if (!secondConfirm) {
+
+        return;
+    }
+
+    deleteLoading.value = true;
+
+    try {
+
+        const response =
+            await axios.delete(
+                '/api/account'
+            );
+
+        if (response.data.success) {
+
+            alert(
+                response.data.message
+            );
+
+            window.location.href =
+                '/register';
+        }
+
+    } catch (err) {
+
+        alert(
+            err.response?.data?.message ||
+            'Unable to delete account.'
+        );
+
+    } finally {
+
+        deleteLoading.value = false;
+    }
+};
+
+
+/*
+|--------------------------------------------------------------------------
+| Format Date
+|--------------------------------------------------------------------------
+*/
+
+const formatDate = (date) => {
+
+    if (!date) {
+
+        return 'Never';
+    }
+
+    return new Date(date)
+        .toLocaleString();
+};
+
+
+/*
+|--------------------------------------------------------------------------
+| Load
+|--------------------------------------------------------------------------
+*/
+
+onMounted(() => {
+
+    loadSecurity();
+
+});
+
 </script>
-
-
-<style scoped>
-
-.security-page {
-    min-height: calc(100vh - 80px);
-}
-
-
-.security-card {
-
-    border: none;
-
-    border-radius: 12px;
-
-    box-shadow:
-        0 4px 15px
-        rgba(0, 0, 0, 0.08);
-
-}
-
-
-.security-icon {
-
-    font-size: 28px;
-
-    margin-bottom: 10px;
-
-}
-
-
-.session-item {
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: space-between;
-
-    gap: 20px;
-
-    padding: 20px;
-
-    border-bottom:
-        1px solid #eeeeee;
-
-}
-
-
-.session-item:last-child {
-
-    border-bottom: none;
-
-}
-
-
-.session-info {
-
-    display: flex;
-
-    align-items: flex-start;
-
-    gap: 15px;
-
-}
-
-
-.device-icon {
-
-    width: 45px;
-
-    height: 45px;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    font-size: 28px;
-
-    background: #f5f7fa;
-
-    border-radius: 10px;
-
-}
-
-
-.session-details {
-
-    color: #6c757d;
-
-    font-size: 14px;
-
-    line-height: 1.8;
-
-}
-
-
-.activity-item {
-
-    display: grid;
-
-    grid-template-columns:
-        140px
-        1fr
-        150px
-        200px;
-
-    gap: 15px;
-
-    align-items: center;
-
-    padding: 15px 20px;
-
-    border-bottom:
-        1px solid #eeeeee;
-
-}
-
-
-.activity-item:last-child {
-
-    border-bottom: none;
-
-}
-
-
-.activity-description {
-
-    font-weight: 500;
-
-}
-
-
-.activity-ip,
-.activity-date {
-
-    color: #6c757d;
-
-    font-size: 14px;
-
-}
-
-
-@media (max-width: 768px) {
-
-    .session-item {
-
-        flex-direction: column;
-
-        align-items: flex-start;
-
-    }
-
-
-    .activity-item {
-
-        grid-template-columns: 1fr;
-
-        gap: 5px;
-
-    }
-
-}
-
-</style>
